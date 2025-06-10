@@ -5,15 +5,18 @@ import sendgrid
 from sendgrid.helpers.mail import Email, Mail, Content, To
 from agents import Agent, function_tool
 
+FROM_EMAIL_ADDRESS = os.environ.get('FROM_EMAIL_ADDRESS')
+TO_EMAIL_ADDRESS = os.environ.get('TO_EMAIL_ADDRESS')
+
 @function_tool
 def send_email(subject: str, html_body: str) -> Dict[str, str]:
     """ Send an email with the given subject and HTML body """
     sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
-    from_email = Email("ed@edwarddonner.com") # put your verified sender here
-    to_email = To("ed.donner@gmail.com") # put your recipient here
+    from_email = Email(FROM_EMAIL_ADDRESS) # put your verified sender here
+    to_email = To(TO_EMAIL_ADDRESS) # put your recipient here
     content = Content("text/html", html_body)
     mail = Mail(from_email, to_email, subject, content).get()
-    response = sg.client.mail.send.post(request_body=mail)
+    response = sg.client.mail.send.post(request_body=mail) # type: ignore
     print("Email response", response.status_code)
     return {"status": "success"}
 
